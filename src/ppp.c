@@ -652,10 +652,10 @@ static void udbias_ppp(rtk_t *rtk, const obsd_t *obs, int n, const nav_t *nav)
     
     /* handle day-boundary clock jump */
     if (rtk->opt.posopt[5]) {
-        clk_jump=ROUND(time2gpst(obs[0].time,NULL)*10)%864000==0;
-    }
+		// clk_jump=ROUND(time2gpst(obs[0].time,NULL)*10)%864000==0;
+	}
     for (i=0;i<MAXSAT;i++) for (j=0;j<rtk->opt.nf;j++) {
-        rtk->ssat[i].slip[j]=0;
+		rtk->ssat[i].slip[j]=0;
     }
     /* detect cycle slip by LLI */
     detslp_ll(rtk,obs,n);
