@@ -339,7 +339,7 @@ static int valsol(const double *azel, const int *vsat, int n,
                   const prcopt_t *opt, const double *v, int nv, int nx,
                   char *msg)
 {
-    double azels[MAXOBS*2],dop[4],vv;
+	double azels[MAXOBS*2],dop[4],vv;
     int i,ns;
     
     trace(3,"valsol  : n=%d nv=%d\n",n,nv);
@@ -617,18 +617,19 @@ extern int pntpos(const obsd_t *obs, int n, const nav_t *nav,
     
     sol->stat=SOLQ_NONE;
     
-    if (n<=0) {
+	if (n<=0) {
         strcpy(msg,"no observation data");
         return 0;
     }
     sol->time=obs[0].time;
-    msg[0]='\0';
+	msg[0]='\0';
     
     rs=mat(6,n); dts=mat(2,n); var=mat(1,n); azel_=zeros(2,n); resp=mat(1,n);
     
-    if (opt_.mode!=PMODE_SINGLE) { /* for precise positioning */
-        opt_.ionoopt=IONOOPT_BRDC;
-        opt_.tropopt=TROPOPT_SAAS;
+	if (opt_.mode!=PMODE_SINGLE) { /* for precise positioning */
+		opt_.sateph =EPHOPT_BRDC;
+		opt_.ionoopt=IONOOPT_BRDC;
+		opt_.tropopt=TROPOPT_SAAS;
     }
     /* satellite positons, velocities and clocks */
     satposs(sol->time,obs,n,nav,opt_.sateph,rs,dts,var,svh);
