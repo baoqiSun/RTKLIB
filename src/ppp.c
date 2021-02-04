@@ -154,9 +154,12 @@ extern int pppoutstat(rtk_t *rtk, char *buff)
     }
     /* receiver clocks */
     i=IC(0,&rtk->opt);
+    /* p+=sprintf(p,"$CLK,%d,%.3f,%d,%d,%.3f,%.3f,%.3f,%.3f\n",
+               week,tow,rtk->sol.stat,1,x[i]*1E9/CLIGHT,x[i+1]*1E9/CLIGHT,
+               STD(rtk,i)*1E9/CLIGHT,STD(rtk,i+1)*1E9/CLIGHT); */
     p+=sprintf(p,"$CLK,%d,%.3f,%d,%d,%.3f,%.3f,%.3f,%.3f\n",
                week,tow,rtk->sol.stat,1,x[i]*1E9/CLIGHT,x[i+1]*1E9/CLIGHT,
-               STD(rtk,i)*1E9/CLIGHT,STD(rtk,i+1)*1E9/CLIGHT);
+               x[i+2]*1E9/CLIGHT,x[i+3]*1E9/CLIGHT);
     
     /* tropospheric parameters */
     if (rtk->opt.tropopt==TROPOPT_EST||rtk->opt.tropopt==TROPOPT_ESTG) {
@@ -557,7 +560,9 @@ static void udclk_ppp(rtk_t *rtk)
         if (rtk->opt.sateph==EPHOPT_PREC) {
             /* time of prec ephemeris is based gpst */
             /* negelect receiver inter-system bias  */
-            dtr=rtk->sol.dtr[0];
+            // dtr=rtk->sol.dtr[0];
+            /* consider receiver inter-system bias  */
+            dtr=i==0?rtk->sol.dtr[0]:rtk->sol.dtr[0]+rtk->sol.dtr[i];
         }
         else {
             dtr=i==0?rtk->sol.dtr[0]:rtk->sol.dtr[0]+rtk->sol.dtr[i];
