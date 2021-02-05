@@ -1146,13 +1146,20 @@ static int outecef(uint8_t *buff, const char *s, const sol_t *sol,
     
     trace(3,"outecef:\n");
     
-    p+=sprintf(p,"%s%s%14.4f%s%14.4f%s%14.4f%s%3d%s%3d%s%8.4f%s%8.4f%s%8.4f%s"
-               "%8.4f%s%8.4f%s%8.4f%s%6.2f%s%6.1f",
-               s,sep,sol->rr[0],sep,sol->rr[1],sep,sol->rr[2],sep,sol->stat,sep,
+    p+=sprintf(p,"%s%s%14.4f%s%14.4f%s%14.4f%s%14.4f%s%14.4f%s%14.4f%s%14.4f%s"
+               "%14.4f%s%3d%s%3d%s%8.4f%s%8.4f%s%8.4f%s%8.4f%s%8.4f%s%8.4f%s"
+               "%6.2f%s%6.1f",
+               s,sep,sol->rr[0],sep,sol->rr[1],sep,sol->rr[2],sep,
+               sol->dtr[0]*1E9/CLIGHT,sep,
+               (sol->dtr[1]+sol->dtr[0])*1E9/CLIGHT,sep,
+               (sol->dtr[2]+sol->dtr[0])*1E9/CLIGHT,sep,
+               (sol->dtr[3]+sol->dtr[0])*1E9/CLIGHT,sep,
+               (sol->dtr[4]+sol->dtr[0])*1E9/CLIGHT,sep,
+               sol->stat,sep,
                sol->ns,sep,SQRT(sol->qr[0]),sep,SQRT(sol->qr[1]),sep,
                SQRT(sol->qr[2]),sep,sqvar(sol->qr[3]),sep,sqvar(sol->qr[4]),sep,
                sqvar(sol->qr[5]),sep,sol->age,sep,sol->ratio);
-    
+
     if (opt->outvel) { /* output velocity */
         p+=sprintf(p,"%s%10.5f%s%10.5f%s%10.5f%s%9.5f%s%8.5f%s%8.5f%s%8.5f%s"
                    "%8.5f%s%8.5f",
@@ -1442,7 +1449,7 @@ extern int outprcopts(uint8_t *buff, const prcopt_t *opt)
     
     p+=sprintf(p,"%s pos mode  : %s\r\n",COMMENTH,s1[opt->mode]);
     
-    if (PMODE_DGPS<=opt->mode&&opt->mode<=PMODE_FIXED) {
+    if (PMODE_SINGLE<=opt->mode&&opt->mode<=PMODE_FIXED) {
         p+=sprintf(p,"%s freqs     : %s\r\n",COMMENTH,s2[opt->nf-1]);
     }
     if (opt->mode>PMODE_SINGLE) {
@@ -1538,12 +1545,15 @@ extern int outsolheads(uint8_t *buff, const solopt_t *opt)
         }
     }
     else if (opt->posf==SOLF_XYZ) { /* x/y/z-ecef */
-        p+=sprintf(p,"%14s%s%14s%s%14s%s%3s%s%3s%s%8s%s%8s%s%8s%s%8s%s%8s%s%8s"
-                   "%s%6s%s%6s",
-                   "x-ecef(m)",sep,"y-ecef(m)",sep,"z-ecef(m)",sep,"Q",sep,"ns",
-                   sep,"sdx(m)",sep,"sdy(m)",sep,"sdz(m)",sep,"sdxy(m)",sep,
+        p+=sprintf(p,"%14s%s%14s%s%14s%s%14s%s%14s%s%14s%s%14s%s%14s%s%3s%s%3s%s%8s%s"
+                   "%8s%s%8s%s%8s%s%8s%s%8s%s%8s%s%6s%s%6s",
+                   "x-ecef(m)",sep,"y-ecef(m)",sep,"z-ecef(m)",sep,
+                   "GPS Clock(ns)",sep,"GLO Clock(ns)",sep,"GAL Clock(ns)",sep,
+                   "BDS Clock(ns)",sep,"IRN Clock(ns)",sep,
+                   "Q",sep,"ns",sep,"sdx(m)",sep,"sdy(m)",sep,"sdz(m)",sep,
+                   "sdt(m)",sep,"sdxy(m)",sep,
                    "sdyz(m)",sep,"sdzx(m)",sep,"age(s)",sep,"ratio");
-        
+
         if (opt->outvel) {
             p+=sprintf(p,"%s%10s%s%10s%s%10s%s%9s%s%8s%s%8s%s%8s%s%8s%s%8s",
                        sep,"vx(m/s)",sep,"vy(m/s)",sep,"vz(m/s)",sep,"sdvx",sep,
