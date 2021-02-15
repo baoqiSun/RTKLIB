@@ -1014,6 +1014,8 @@ typedef struct {        /* processing options type */
     double odisp[2][6*11]; /* ocean tide loading parameters {rov,base} */
     int  freqopt;       /* disable L2-AR */
     char pppopt[256];   /* ppp option */
+    int  obssel[7];     /* observation selection index for each system (0:off,1:on) */
+    char obspris[7][MAXFREQ][256]; /* observation code priority for each freq-index (e.g. 2I,2Q,2X) */	
 } prcopt_t;
 
 typedef struct {        /* solution options type */
@@ -1316,6 +1318,7 @@ EXPORT int  testsnr(int base, int freq, double el, double snr,
                     const snrmask_t *mask);
 EXPORT void setcodepri(int sys, int idx, const char *pri);
 EXPORT int  getcodepri(int sys, uint8_t code, const char *opt);
+EXPORT void updcodepri(prcopt_t *popt);
 
 /* matrix and vector functions -----------------------------------------------*/
 EXPORT double *mat  (int n, int m);

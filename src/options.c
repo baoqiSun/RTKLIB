@@ -40,6 +40,7 @@ static double antpos_[2][3];
 static char exsats_[1024];
 static char snrmask_[NFREQ][1024];
 
+
 /* system options table ------------------------------------------------------*/
 #define SWTOPT  "0:off,1:on"
 #define MODOPT  "0:single,1:dgps,2:kinematic,3:static,4:movingbase,5:fixed,6:ppp-kine,7:ppp-static,8:ppp-fixed"
@@ -73,6 +74,18 @@ EXPORT opt_t sysopts[]={
     {"pos1-snrmask_L1", 2,  (void *)snrmask_[0],         ""     },
     {"pos1-snrmask_L2", 2,  (void *)snrmask_[1],         ""     },
     {"pos1-snrmask_L5", 2,  (void *)snrmask_[2],         ""     },
+    {"pos1-obssel_GPS", 3,  (void *)&prcopt_.obssel[0],  SWTOPT },
+    {"pos1-codpri_GPS_L1", 2,  (void *)&prcopt_.obspris[0][0],""},
+    {"pos1-codpri_GPS_L2", 2,  (void *)&prcopt_.obspris[0][1],""},
+    {"pos1-codpri_GPS_L3", 2,  (void *)&prcopt_.obspris[0][2],""},
+    {"pos1-obssel_GAL", 3,  (void *)&prcopt_.obssel[2],  SWTOPT },
+    {"pos1-codpri_GAL_L1", 2,  (void *)&prcopt_.obspris[2][0],""},
+    {"pos1-codpri_GAL_L2", 2,  (void *)&prcopt_.obspris[2][1],""},
+    {"pos1-codpri_GAL_L3", 2,  (void *)&prcopt_.obspris[2][2],""},
+    {"pos1-obssel_BDS", 3,  (void *)&prcopt_.obssel[5],  SWTOPT },
+    {"pos1-codpri_BDS_L1", 2,  (void *)&prcopt_.obspris[5][0],""},
+    {"pos1-codpri_BDS_L2", 2,  (void *)&prcopt_.obspris[5][1],""},
+    {"pos1-codpri_BDS_L3", 2,  (void *)&prcopt_.obspris[5][2],""},
     {"pos1-dynamics",   3,  (void *)&prcopt_.dynamics,   SWTOPT },
     {"pos1-tidecorr",   3,  (void *)&prcopt_.tidecorr,   TIDEOPT},
     {"pos1-ionoopt",    3,  (void *)&prcopt_.ionoopt,    IONOPT },
@@ -384,15 +397,15 @@ static void buff2sysopts(void)
     double pos[3],*rr;
     char buff[1024],*p,*id;
     int i,j,sat,*ps;
-    
+
     prcopt_.elmin     =elmask_    *D2R;
     prcopt_.elmaskar  =elmaskar_  *D2R;
     prcopt_.elmaskhold=elmaskhold_*D2R;
-    
+
     for (i=0;i<2;i++) {
         ps=i==0?&prcopt_.rovpos:&prcopt_.refpos;
         rr=i==0?prcopt_.ru:prcopt_.rb;
-        
+
         if (antpostype_[i]==0) { /* lat/lon/hgt */
             *ps=0;
             pos[0]=antpos_[i][0]*D2R;
@@ -438,15 +451,15 @@ static void sysopts2buff(void)
     double pos[3],*rr;
     char id[32],*p;
     int i,j,sat,*ps;
-    
+
     elmask_    =prcopt_.elmin     *R2D;
     elmaskar_  =prcopt_.elmaskar  *R2D;
     elmaskhold_=prcopt_.elmaskhold*R2D;
-    
+
     for (i=0;i<2;i++) {
         ps=i==0?&prcopt_.rovpos:&prcopt_.refpos;
         rr=i==0?prcopt_.ru:prcopt_.rb;
-        
+
         if (*ps==0) {
             antpostype_[i]=0;
             ecef2pos(rr,pos);

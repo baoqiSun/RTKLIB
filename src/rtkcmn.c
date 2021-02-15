@@ -254,11 +254,39 @@ static char *obscodes[]={       /* observation code strings */
     ""  ,"1C","1P","1W","1Y", "1M","1N","1S","1L","1E", /*  0- 9 */
     "1A","1B","1X","1Z","2C", "2D","2S","2L","2X","2P", /* 10-19 */
     "2W","2Y","2M","2N","5I", "5Q","5X","7I","7Q","7X", /* 20-29 */
-    "6A","6B","6C","6X","6Z", "6S","6L","8L","8Q","8X", /* 30-39 */
+    "6A","6B","6C","6X","6Z", "6S","6L","8I","8Q","8X", /* 30-39 */
     "2I","2Q","6I","6Q","3I", "3Q","3X","1I","1Q","5A", /* 40-49 */
     "5B","5C","9A","9B","9C", "9X","1D","5D","5P","5Z", /* 50-59 */
     "6E","7D","7P","7Z","8D", "8P","4A","4B","4X",""    /* 60-69 */
 };
+static unsigned char obsfreqs_GPS[] = { /* freq number for GPS observation */
+    0, 1, 1, 1, 1, 1, 1, 1, 1, 0, /*  0- 9 */
+    0, 0, 0, 0, 2, 2, 2, 2, 2, 2, /* 10-19 */
+    2, 2, 2, 2, 3, 3, 3, 0, 0, 0, /* 20-29 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 30-39 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 40-49 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 50-59 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0  /* 60-69 */
+};
+static unsigned char obsfreqs_BDS[] = { /* freq number for BDS observation */
+    0, 0, 1, 0, 0, 0, 1, 0, 0, 0, /*  0- 9 */
+    1, 0, 1, 0, 0, 0, 0, 0, 1, 0, /* 10-19 */
+    0, 0, 0, 0, 0, 0, 3, 2, 2, 2, /* 20-29 */
+    4, 0, 0, 4, 0, 0, 0, 0, 0, 5, /* 30-39 */
+    1, 1, 4, 4, 0, 0, 0, 0, 0, 0, /* 40-49 */
+    0, 0, 0, 0, 0, 0, 1, 3, 3, 0, /* 50-59 */
+    0, 2, 2, 2, 5, 5, 0, 0, 0, 0  /* 60-69 */
+};
+static unsigned char obsfreqs_GAL[] = { /* freq number for GAL observation */
+    0, 1, 0, 0, 0, 0, 0, 0, 0, 0, /*  0- 9 */
+    1, 1, 1, 1, 0, 0, 0, 0, 0, 0, /* 10-19 */
+    0, 0, 0, 0, 3, 3, 3, 2, 2, 2, /* 20-29 */
+    4, 4, 4, 4, 4, 0, 0, 5, 5, 5, /* 30-39 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 40-49 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* 50-59 */
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0  /* 60-69 */
+};
+
 static char codepris[7][MAXFREQ][16]={  /* code priority for each freq-index */
    /*    0         1          2          3         4         5     */
     {"CPYWMNSL","PYWCMNDLSX","IQX"     ,""       ,""       ,""      ,""}, /* GPS */
@@ -444,7 +472,7 @@ extern int satsys(int sat, int *prn)
         sys=SYS_QZS; sat+=MINPRNQZS-1; 
     }
     else if ((sat-=NSATQZS)<=NSATCMP) {
-        sys=SYS_CMP; sat+=MINPRNCMP-1; 
+        sys=SYS_CMP; sat+=MINPRNCMP-1;
     }
     else if ((sat-=NSATCMP)<=NSATIRN) {
         sys=SYS_IRN; sat+=MINPRNIRN-1; 
@@ -478,7 +506,7 @@ extern int satid2no(const char *id)
         return satno(sys,prn);
     }
     if (sscanf(id,"%c%d",&code,&prn)<2) return 0;
-    
+
     switch (code) {
         case 'G': sys=SYS_GPS; prn+=MINPRNGPS-1; break;
         case 'R': sys=SYS_GLO; prn+=MINPRNGLO-1; break;
@@ -599,11 +627,11 @@ extern char *code2obs(uint8_t code)
 static int code2freq_GPS(uint8_t code, double *freq)
 {
     char *obs=code2obs(code);
-    
+
     switch (obs[0]) {
-        case '1': *freq=FREQ1; return 0; /* L1 */
-        case '2': *freq=FREQ2; return 1; /* L2 */
-        case '5': *freq=FREQ5; return 2; /* L5 */
+        case '1': *freq=FREQ1; return obsfreqs_GPS[code]-1; /* L1 */
+        case '2': *freq=FREQ2; return obsfreqs_GPS[code]-1; /* L2 */
+        case '5': *freq=FREQ5; return obsfreqs_GPS[code]-1; /* L5 */
     }
     return -1;
 }
@@ -611,9 +639,9 @@ static int code2freq_GPS(uint8_t code, double *freq)
 static int code2freq_GLO(uint8_t code, int fcn, double *freq)
 {
     char *obs=code2obs(code);
-    
+
     if (fcn<-7||fcn>6) return -1;
-    
+
     switch (obs[0]) {
         case '1': *freq=FREQ1_GLO+DFRQ1_GLO*fcn; return 0; /* G1 */
         case '2': *freq=FREQ2_GLO+DFRQ2_GLO*fcn; return 1; /* G2 */
@@ -627,13 +655,13 @@ static int code2freq_GLO(uint8_t code, int fcn, double *freq)
 static int code2freq_GAL(uint8_t code, double *freq)
 {
     char *obs=code2obs(code);
-    
+
     switch (obs[0]) {
-        case '1': *freq=FREQ1; return 0; /* E1 */
-        case '7': *freq=FREQ7; return 1; /* E5b */
-        case '5': *freq=FREQ5; return 2; /* E5a */
-        case '6': *freq=FREQ6; return 3; /* E6 */
-        case '8': *freq=FREQ8; return 4; /* E5ab */
+        case '1': *freq=FREQ1; return obsfreqs_GAL[code]-1; /* E1 */
+        case '7': *freq=FREQ7; return obsfreqs_GAL[code]-1; /* E5b */
+        case '5': *freq=FREQ5; return obsfreqs_GAL[code]-1; /* E5a */
+        case '6': *freq=FREQ6; return obsfreqs_GAL[code]-1; /* E6 */
+        case '8': *freq=FREQ8; return obsfreqs_GAL[code]-1; /* E5ab */
     }
     return -1;
 }
@@ -641,7 +669,7 @@ static int code2freq_GAL(uint8_t code, double *freq)
 static int code2freq_QZS(uint8_t code, double *freq)
 {
     char *obs=code2obs(code);
-    
+
     switch (obs[0]) {
         case '1': *freq=FREQ1; return 0; /* L1 */
         case '2': *freq=FREQ2; return 1; /* L2 */
@@ -667,12 +695,12 @@ static int code2freq_BDS(uint8_t code, double *freq)
     char *obs=code2obs(code);
     
     switch (obs[0]) {
-        case '1': *freq=FREQ1;     return 0; /* B1C */
-        case '2': *freq=FREQ1_CMP; return 0; /* B1I */
-        case '7': *freq=FREQ2_CMP; return 1; /* B2I/B2b */
-        case '5': *freq=FREQ5;     return 2; /* B2a */
-        case '6': *freq=FREQ3_CMP; return 3; /* B3 */
-        case '8': *freq=FREQ8;     return 4; /* B2ab */
+        case '1': *freq=FREQ1;     return obsfreqs_BDS[code]-1; /* B1C */
+        case '2': *freq=FREQ1_CMP; return obsfreqs_BDS[code]-1; /* B1I */
+        case '7': *freq=FREQ2_CMP; return obsfreqs_BDS[code]-1; /* B2I/B2b */
+        case '5': *freq=FREQ5;     return obsfreqs_BDS[code]-1; /* B2a */
+        case '6': *freq=FREQ3_CMP; return obsfreqs_BDS[code]-1; /* B3 */
+        case '8': *freq=FREQ8;     return obsfreqs_BDS[code]-1; /* B2ab */
     }
     return -1;
 }
@@ -680,7 +708,7 @@ static int code2freq_BDS(uint8_t code, double *freq)
 static int code2freq_IRN(uint8_t code, double *freq)
 {
     char *obs=code2obs(code);
-    
+
     switch (obs[0]) {
         case '5': *freq=FREQ5; return 0; /* L5 */
         case '9': *freq=FREQ9; return 1; /* S */
@@ -778,7 +806,7 @@ extern double sat2freq(int sat, uint8_t code, const nav_t *nav)
 extern void setcodepri(int sys, int idx, const char *pri)
 {
     trace(3,"setcodepri:sys=%d idx=%d pri=%s\n",sys,idx,pri);
-    
+
     if (idx<0||idx>=MAXFREQ) return;
     if (sys&SYS_GPS) strcpy(codepris[0][idx],pri);
     if (sys&SYS_GLO) strcpy(codepris[1][idx],pri);
@@ -821,6 +849,71 @@ extern int getcodepri(int sys, uint8_t code, const char *opt)
     }
     /* search code priority */
     return (p=strchr(codepris[i][j],obs[1]))?14-(int)(p-codepris[i][j]):0;
+}
+/* update code priority --------------------------------------------------------
+* update code priority and freq index by user setting from option file
+* args   : int    sys       I   system (or of SYS_???)
+*          int    idx       I   frequency index (0- )
+*          char   *pri      I   priority of codes (series of code characters)
+*                               (higher priority precedes lower)
+* return : none
+*-----------------------------------------------------------------------------*/
+extern void updcodepri(prcopt_t *popt)
+{
+    int i,j,sys,code;
+    char buff[256],pri[16],*p;
+
+    for (i=0;i<7;i++) {
+        sys=i;
+        if (popt->obssel[i]!=1) continue;
+        switch (sys) {
+            case 0:
+                /* reset obsfreqs */
+                for (j=0;j<sizeof(obsfreqs_GPS);j++) obsfreqs_GPS[j]=0;
+                for (j=0;j<NFREQ;j++) {
+                    pri[0]='\0';
+                    strcpy(buff,popt->obspris[i][j]);
+                    for (p=strtok(buff,",");p;p=strtok(NULL,",")) {
+                        code=obs2code(p);
+                        obsfreqs_GPS[code]=j+1;
+                        strcat(pri,&p[1]);
+                    }
+                    if (pri[0]!='\0') strcpy(codepris[i][j],pri);
+                }
+            case 1: continue;
+            case 2:
+                /* reset obsfreqs */
+                for (j=0;j<sizeof(obsfreqs_GAL);j++) obsfreqs_GAL[j]=0;
+                for (j=0;j<NFREQ;j++) {
+                    pri[0]='\0';
+                    strcpy(buff,popt->obspris[i][j]);
+                    for (p=strtok(buff,",");p;p=strtok(NULL,",")) {
+                        code=obs2code(p);
+                        obsfreqs_GAL[code]=j+1;
+                        strcat(pri,&p[1]);
+                    }
+                    if (pri[0]!='\0') strcpy(codepris[i][j],pri);
+                }
+            case 3: continue;
+            case 4: continue;
+            case 5: /* BDS */
+                /* reset obsfreqs */
+                for (j=0;j<sizeof(obsfreqs_BDS);j++) obsfreqs_BDS[j]=0;
+                for (j=0;j<NFREQ;j++) {
+                    pri[0]='\0';
+                    strcpy(buff,popt->obspris[i][j]);
+                    for (p=strtok(buff,",");p;p=strtok(NULL,",")) {
+                        code=obs2code(p);
+                        obsfreqs_BDS[code]=j+1;
+                        strcat(pri,&p[1]);
+                    }
+                    if (pri[0]!='\0') strcpy(codepris[5][j],pri);
+                }
+            case 6: continue;
+        }
+
+
+    }
 }
 /* extract unsigned/signed bits ------------------------------------------------
 * extract unsigned/signed bits from byte data
