@@ -765,6 +765,7 @@ int __fastcall TMainForm::ExecProc(void)
     if (TimeUnitF->Checked) tu=str2dbl(TimeUnit->Text)*3600.0;
     
     if (!GetOption(prcopt,solopt,filopt)) return 0;
+	updcodepri(&prcopt);
     
     // set input/output files
     for (i=0;i<6;i++) infile[i]=infile_[i];
@@ -851,6 +852,22 @@ int __fastcall TMainForm::GetOption(prcopt_t &prcopt, solopt_t &solopt,
     prcopt.navsys   =NavSys;
     prcopt.elmin    =ElMask*D2R;
     prcopt.snrmask  =SnrMask;
+    prcopt.obssel[0]=ObsSel[0];
+    prcopt.obssel[1]=ObsSel[1];
+    prcopt.obssel[2]=ObsSel[2];
+    prcopt.obssel[3]=ObsSel[3];
+    prcopt.obssel[4]=ObsSel[4];
+    prcopt.obssel[5]=ObsSel[5];
+    prcopt.obssel[6]=ObsSel[6];
+    strcpy(prcopt.obspris[0][0],CodePriGPSL1.c_str());
+    strcpy(prcopt.obspris[0][1],CodePriGPSL2.c_str());
+    strcpy(prcopt.obspris[0][2],CodePriGPSL3.c_str());
+    strcpy(prcopt.obspris[2][0],CodePriGALL1.c_str());
+    strcpy(prcopt.obspris[2][1],CodePriGALL2.c_str());
+    strcpy(prcopt.obspris[2][2],CodePriGALL3.c_str());
+    strcpy(prcopt.obspris[5][0],CodePriBDSL1.c_str());
+    strcpy(prcopt.obspris[5][1],CodePriBDSL2.c_str());
+    strcpy(prcopt.obspris[5][2],CodePriBDSL3.c_str());
     prcopt.sateph   =SatEphem;
     prcopt.modear   =AmbRes;
     prcopt.glomodear=GloAmbRes;
@@ -1210,6 +1227,18 @@ void __fastcall TMainForm::LoadOpt(void)
         SnrMask.mask[i][j]=
             ini->ReadFloat("opt",s.sprintf("snrmask_%d_%d",i+1,j+1),0.0);
     }
+    ObsSel[0]          =ini->ReadInteger("opt","obssel_GPS",     0);
+    ObsSel[2]          =ini->ReadInteger("opt","obssel_GAL",     0);
+    ObsSel[5]          =ini->ReadInteger("opt","obssel_BDS",     0);
+    CodePriGPSL1       =ini->ReadString ("opt","codpri_GPS_L1", "");
+    CodePriGPSL2       =ini->ReadString ("opt","codpri_GPS_L2", "");
+    CodePriGPSL3       =ini->ReadString ("opt","codpri_GPS_L3", "");
+    CodePriGALL1       =ini->ReadString ("opt","codpri_GAL_L1", "");
+    CodePriGALL2       =ini->ReadString ("opt","codpri_GAL_L2", "");
+    CodePriGALL3       =ini->ReadString ("opt","codpri_GAL_L3", "");
+    CodePriBDSL1       =ini->ReadString ("opt","codpri_BDS_L1", "");
+    CodePriBDSL2       =ini->ReadString ("opt","codpri_BDS_L2", "");
+    CodePriBDSL3       =ini->ReadString ("opt","codpri_BDS_L3", "");
     IonoOpt            =ini->ReadInteger("opt","ionoopt",     IONOOPT_BRDC);
     TropOpt            =ini->ReadInteger("opt","tropopt",     TROPOPT_SAAS);
     RcvBiasEst         =ini->ReadInteger("opt","rcvbiasest",     0);
@@ -1419,6 +1448,20 @@ void __fastcall TMainForm::SaveOpt(void)
         ini->WriteFloat("opt",s.sprintf("snrmask_%d_%d",i+1,j+1),
                         SnrMask.mask[i][j]);
     }
+
+    ini->WriteInteger("opt","obssel_GPS",  ObsSel[0]   );
+    ini->WriteInteger("opt","obssel_GAL",  ObsSel[2]   );
+    ini->WriteInteger("opt","obssel_BDS",  ObsSel[5]   );	
+    ini->WriteString ("opt","codpri_GPS_L1",CodePriGPSL1);
+    ini->WriteString ("opt","codpri_GPS_L2",CodePriGPSL2);
+    ini->WriteString ("opt","codpri_GPS_L3",CodePriGPSL3);	
+    ini->WriteString ("opt","codpri_GAL_L1",CodePriGALL1);
+    ini->WriteString ("opt","codpri_GAL_L2",CodePriGALL2);
+    ini->WriteString ("opt","codpri_GAL_L3",CodePriGALL3);
+    ini->WriteString ("opt","codpri_BDS_L1",CodePriBDSL1);
+    ini->WriteString ("opt","codpri_BDS_L2",CodePriBDSL2);
+    ini->WriteString ("opt","codpri_BDS_L3",CodePriBDSL3);	
+	
     ini->WriteInteger("opt","ionoopt",     IonoOpt     );
     ini->WriteInteger("opt","tropopt",     TropOpt     );
     ini->WriteInteger("opt","rcvbiasest",  RcvBiasEst  );

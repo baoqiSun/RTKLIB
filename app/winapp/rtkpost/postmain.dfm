@@ -3,8 +3,8 @@ object MainForm: TMainForm
   Top = 0
   BorderIcons = [biSystemMenu, biMinimize]
   Caption = 'RTKPOST'
-  ClientHeight = 347
-  ClientWidth = 472
+  ClientHeight = 359
+  ClientWidth = 480
   Color = clWindow
   Constraints.MaxHeight = 386
   Constraints.MaxWidth = 800
@@ -25,16 +25,17 @@ object MainForm: TMainForm
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 472
+    Width = 480
     Height = 281
     Align = alTop
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitWidth = 472
     object Panel3: TPanel
       AlignWithMargins = True
       Left = 1
       Top = 1
-      Width = 470
+      Width = 478
       Height = 43
       Margins.Left = 1
       Margins.Top = 1
@@ -44,6 +45,7 @@ object MainForm: TMainForm
       BevelInner = bvRaised
       BevelOuter = bvLowered
       TabOrder = 0
+      ExplicitWidth = 470
       object BtnTime1: TSpeedButton
         Left = 118
         Top = 1
@@ -160,13 +162,14 @@ object MainForm: TMainForm
         OnChangingEx = TimeY1UDChangingEx
       end
       object Panel6: TPanel
-        Left = 331
+        Left = 339
         Top = 2
         Width = 137
         Height = 39
         Align = alRight
         BevelOuter = bvNone
         TabOrder = 10
+        ExplicitLeft = 331
         object LabelTimeInt: TLabel
           Left = 58
           Top = 19
@@ -237,7 +240,7 @@ object MainForm: TMainForm
       AlignWithMargins = True
       Left = 1
       Top = 46
-      Width = 470
+      Width = 478
       Height = 183
       Margins.Left = 1
       Margins.Top = 1
@@ -248,6 +251,7 @@ object MainForm: TMainForm
       BevelOuter = bvLowered
       TabOrder = 1
       OnResize = Panel4Resize
+      ExplicitWidth = 470
       object LabelInputFile1: TLabel
         Left = 6
         Top = 4
@@ -670,7 +674,7 @@ object MainForm: TMainForm
       AlignWithMargins = True
       Left = 1
       Top = 231
-      Width = 470
+      Width = 478
       Height = 49
       Margins.Left = 1
       Margins.Top = 1
@@ -681,6 +685,7 @@ object MainForm: TMainForm
       BevelOuter = bvLowered
       TabOrder = 2
       OnResize = Panel5Resize
+      ExplicitWidth = 470
       object Label1: TLabel
         Left = 6
         Top = 5
@@ -758,8 +763,8 @@ object MainForm: TMainForm
   object Panel2: TPanel
     AlignWithMargins = True
     Left = 2
-    Top = 316
-    Width = 469
+    Top = 328
+    Width = 477
     Height = 30
     Margins.Left = 2
     Margins.Top = 1
@@ -769,6 +774,8 @@ object MainForm: TMainForm
     BevelOuter = bvNone
     TabOrder = 1
     OnResize = Panel2Resize
+    ExplicitTop = 316
+    ExplicitWidth = 469
     object BtnView: TBitBtn
       Left = 79
       Top = 0
@@ -937,8 +944,8 @@ object MainForm: TMainForm
   object Progress: TProgressBar
     AlignWithMargins = True
     Left = 2
-    Top = 279
-    Width = 468
+    Top = 291
+    Width = 476
     Height = 7
     Margins.Left = 2
     Margins.Top = 1
@@ -948,12 +955,14 @@ object MainForm: TMainForm
     Smooth = True
     Step = 1
     TabOrder = 2
+    ExplicitTop = 279
+    ExplicitWidth = 468
   end
   object Message: TPanel
     AlignWithMargins = True
     Left = 1
-    Top = 289
-    Width = 470
+    Top = 301
+    Width = 478
     Height = 25
     Margins.Left = 1
     Margins.Top = 2
@@ -969,6 +978,8 @@ object MainForm: TMainForm
     Font.Style = []
     ParentFont = False
     TabOrder = 3
+    ExplicitTop = 289
+    ExplicitWidth = 470
     object BtnAbout: TSpeedButton
       Left = 445
       Top = 2

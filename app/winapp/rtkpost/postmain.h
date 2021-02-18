@@ -201,7 +201,7 @@ public:
 	int SolFormat,TimeFormat,LatLonFormat,IntpRefObs,NetRSCorr,SatClkCorr;
 	int SbasCorr,SbasCorr1,SbasCorr2,SbasCorr3,SbasCorr4,TimeDecimal;
 	int SolStatic,SbasSat,MapFunc;
-	int PosOpt[6];
+	int PosOpt[6],ObsSel[7];
 	double ElMask,MaxAgeDiff,RejectThres,RejectGdop;
 	double MeasErrR1,MeasErrR2,MeasErr2,MeasErr3,MeasErr4,MeasErr5;
 	double SatClkStab,RovAntE,RovAntN,RovAntU,RefAntE,RefAntN,RefAntU;
@@ -218,6 +218,9 @@ public:
 	AnsiString GeoidDataFile,IonoFile,DCBFile,EOPFile,BLQFile;
 	AnsiString SbasCorrFile,SatPcvFile,ExSats;
 	AnsiString RovList,BaseList;
+	AnsiString CodePriGPSL1,CodePriGPSL2,CodePriGPSL3;
+    AnsiString CodePriGALL1,CodePriGALL2,CodePriGALL3,CodePriGALL4,CodePriGALL5;
+    AnsiString CodePriBDSL1,CodePriBDSL2,CodePriBDSL3,CodePriBDSL4,CodePriBDSL5;	
 	
 	void __fastcall ViewFile(AnsiString file);
 	void __fastcall ShowMsg(char *msg);
