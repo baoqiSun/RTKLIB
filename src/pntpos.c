@@ -113,19 +113,32 @@ static double prange(const obsd_t *obs, const nav_t *nav, const prcopt_t *opt,
             gamma=SQR(FREQ1_GLO/FREQ2_GLO);
             return (P2-gamma*P1)/(1.0-gamma);
         }
-        else if (sys==SYS_GAL) { /* E1-E5b */
-            gamma=SQR(FREQ1/FREQ7);
+        else if (sys==SYS_GAL) { /* E1-E5b,E1-E5a */
+            /* gamma=SQR(FREQ1/FREQ7); */
+            gamma=SQR(code2freq(sys,obs->code[0],0)/
+                      code2freq(sys,obs->code[1],0));
             if (getseleph(SYS_GAL)) { /* F/NAV */
-                P2-=gettgd(sat,nav,0)-gettgd(sat,nav,1); /* BGD_E5aE5b */
+                if (obs->code[1]==CODE_L7I )
+                    P2-=gettgd(sat,nav,0)-gettgd(sat,nav,1); /* BGD_E5aE5b */
+            }
+            else { /* I/NAV */
+                if (obs->code[1]==CODE_L5I )
+                    P2-=gettgd(sat,nav,1)-gettgd(sat,nav,0); /* BGD_E5bE5a */
             }
             return (P2-gamma*P1)/(1.0-gamma);
         }
-        else if (sys==SYS_CMP) { /* B1-B2 */
-            gamma=SQR(((obs->code[0]==CODE_L2I)?FREQ1_CMP:FREQ1)/FREQ2_CMP);
+        else if (sys==SYS_CMP) { /* B1-B2,B1-B3 */
+            /* gamma=SQR(((obs->code[0]==CODE_L2I)?FREQ1_CMP:FREQ1)/FREQ2_CMP); */
+            gamma=SQR(code2freq(sys,obs->code[0],0)/
+                      code2freq(sys,obs->code[1],0));
             if      (obs->code[0]==CODE_L2I) b1=gettgd(sat,nav,0); /* TGD_B1I */
             else if (obs->code[0]==CODE_L1P) b1=gettgd(sat,nav,2); /* TGD_B1Cp */
             else b1=gettgd(sat,nav,2)+gettgd(sat,nav,4); /* TGD_B1Cp+ISC_B1Cd */
-            b2=gettgd(sat,nav,1); /* TGD_B2I/B2bI (m) */
+            if      (obs->code[1]==CODE_L7I) b2=gettgd(sat,nav,1); /* TGD_B2I/B2bI (m) */
+            else if (obs->code[1]==CODE_L6I) b2=0.0; /* TGD_B3I */
+            else if (obs->code[1]==CODE_L5P) b2=gettgd(sat,nav,3); /* TGD_B2ap */
+            else b2=gettgd(sat,nav,3)+gettgd(sat,nav,5); /* TGD_B2ap+ISC_B2ad */
+            /* b2=gettgd(sat,nav,1); */ /* TGD_B2I/B2bI (m) */
             return ((P2-gamma*P1)-(b2-gamma*b1))/(1.0-gamma);
         }
         else if (sys==SYS_IRN) { /* L5-S */
@@ -153,7 +166,13 @@ static double prange(const obsd_t *obs, const nav_t *nav, const prcopt_t *opt,
         else if (sys==SYS_CMP) { /* B1I/B1Cp/B1Cd */
             if      (obs->code[0]==CODE_L2I) b1=gettgd(sat,nav,0); /* TGD_B1I */
             else if (obs->code[0]==CODE_L1P) b1=gettgd(sat,nav,2); /* TGD_B1Cp */
-            else b1=gettgd(sat,nav,2)+gettgd(sat,nav,4); /* TGD_B1Cp+ISC_B1Cd */
+            else if (obs->code[0]==CODE_L1D)
+                b1=gettgd(sat,nav,2)+gettgd(sat,nav,4); /* TGD_B1Cp+ISC_B1Cd */
+            else if (obs->code[0]==CODE_L7I) b1=gettgd(sat,nav,1); /* TGD_B2I/B2bI (m) */
+            else if (obs->code[0]==CODE_L6I) b1=0.0; /* TGD_B3I */
+            else if (obs->code[0]==CODE_L5P) b1=gettgd(sat,nav,3); /* TGD_B2ap */
+            else if (obs->code[0]==CODE_L5D)
+                b1=gettgd(sat,nav,3)+gettgd(sat,nav,5); /* TGD_B2ap+ISC_B2ad */
             return P1-b1;
         }
         else if (sys==SYS_IRN) { /* L5 */
