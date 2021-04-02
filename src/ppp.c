@@ -650,7 +650,7 @@ static void uddcb_ppp(rtk_t *rtk)
 static void udbias_ppp(rtk_t *rtk, const obsd_t *obs, int n, const nav_t *nav)
 {
     double L[NFREQ],P[NFREQ],Lc,Pc,bias[MAXOBS],offset=0.0,pos[3]={0};
-    double freq1,freq2,ion,dantr[NFREQ]={0},dants[NFREQ]={0};
+    double freq1,freq2,freqf,ion,dantr[NFREQ]={0},dants[NFREQ]={0};
     int i,j,k,f,sat,slip[MAXOBS]={0},clk_jump=0;
     
     trace(3,"udbias  : n=%d\n",n);
@@ -664,7 +664,7 @@ static void udbias_ppp(rtk_t *rtk, const obsd_t *obs, int n, const nav_t *nav)
     }
     /* detect cycle slip by LLI */
     detslp_ll(rtk,obs,n);
-    
+
     /* detect cycle slip by geometry-free phase jump */
     detslp_gf(rtk,obs,n,nav);
     
@@ -696,13 +696,14 @@ static void udbias_ppp(rtk_t *rtk, const obsd_t *obs, int n, const nav_t *nav)
             }
             else if (L[f]!=0.0&&P[f]!=0.0) {
                 freq1=sat2freq(sat,obs[i].code[0],nav);
-                freq2=sat2freq(sat,obs[i].code[f],nav);
+                freq2=sat2freq(sat,obs[i].code[1],nav);
+                freqf=sat2freq(sat,obs[i].code[f],nav);
                 slip[i]=rtk->ssat[sat-1].slip[f];
                 if (obs[i].P[0]==0.0||obs[i].P[1]==0.0||freq1==0.0||freq2==0.0) {
                     continue;
                 }
-                ion=(obs[i].P[0]-obs[i].P[f])/(1.0-SQR(freq1/freq2));
-                bias[i]=L[f]-P[f]+2.0*ion*SQR(freq1/freq2);
+                ion=(obs[i].P[0]-obs[i].P[1])/(1.0-SQR(freq1/freq2));
+                bias[i]=L[f]-P[f]+2.0*ion*SQR(freq1/freqf);
             }
             if (rtk->x[j]==0.0||slip[i]||bias[i]==0.0) continue;
             
@@ -740,7 +741,7 @@ static void udbias_ppp(rtk_t *rtk, const obsd_t *obs, int n, const nav_t *nav)
 static void udstate_ppp(rtk_t *rtk, const obsd_t *obs, int n, const nav_t *nav)
 {
     trace(3,"udstate_ppp: n=%d\n",n);
-    
+
     /* temporal update of position */
     udpos_ppp(rtk);
     
